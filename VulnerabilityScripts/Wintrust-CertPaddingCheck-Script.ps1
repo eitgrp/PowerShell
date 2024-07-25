@@ -1,0 +1,160 @@
+################################
+#           Varibles           #
+#          Start here          #
+#..............................#
+
+# Reg Key Paths #
+
+$ConfigRegKey = "HKLM:\Software\Microsoft\Cryptography\Wintrust\Config"
+$WintrustRegKey = "HKLM:\Software\Microsoft\Cryptography\Wintrust"
+$CryptographyRegKey = "HKLM:\Software\Microsoft\Cryptography"
+
+# Wow64 Key Paths #
+
+$Wow64WintrustRegKey = "HKLM:\Software\Wow6432Node\Microsoft\Cryptography\Wintrust"
+$Wow64ConfigRegKey = "HKLM:\Software\Wow6432Node\Microsoft\Cryptography\Wintrust\Config"
+$Wow64CryptographyRegKey = "HKLM:\Software\Wow6432Node\Microsoft\Cryptography"
+
+# Registry Value Name(s) #
+
+$RegValue = "EnableCertPaddingCheck"
+
+#...............................#
+#         END Varibles          # 
+#################################
+#################################
+#         Your functions        #
+#          Start here           #
+#...............................#
+
+function EnableCertPaddingCheck {
+
+###########################################################################################################################
+    # Making sure the reg values aren't already set #
+###########################################################################################################################
+
+    $ValidateReg64 = Get-ItemPropertyValue -path $Wow64ConfigRegKey -name $RegValue -ErrorAction SilentlyContinue
+
+    $ValidateReg = Get-ItemPropertyValue -path $ConfigRegKey -name $RegValue -ErrorAction SilentlyContinue
+
+    if (($ValidateReg -eq 1) -and ($ValidateReg64 -eq 1)) {
+        return "registry values to enable CertPaddingCheck are already set! Try restarting the machine if the changes have not taken effect."
+    }
+
+###########################################################################################################################
+    # Testing each part of the path and setting the value #
+###########################################################################################################################
+
+    $WintrustTest = test-path -path $WintrustRegKey
+
+    if (!$WintrustTest) {
+        New-Item -Path $CryptographyRegKey -Name "Wintrust"
+    } 
+
+    $ConfigTest = test-path -path $ConfigRegKey
+
+    if (!$ConfigTest) {
+        New-item -path $WintrustRegKey -name "Config"
+    }
+
+    # This cmdlet will set the value if the item already exists, and create it if not, so no validating nessessary #
+
+    New-ItemProperty -Path $ConfigRegKey -name $RegValue -Value 1 -PropertyType "DWord" -Force
+
+    # Same logic but for the Wow64 path #
+
+    $WintrustTest64 = test-path -path $Wow64WintrustRegKey
+    if (!$WintrustTest64) {
+        New-Item -path "HKLM:\Software\Wow6432Node\Microsoft\Cryptography\" -Name "Wintrust"
+    }
+
+    $ConfigTest64 = test-path -path $Wow64ConfigRegKey
+    if( !$ConfigTest64) {
+        New-Item -path $Wow64WintrustRegKey -Name "Config"
+    }
+
+    New-ItemProperty -Path $Wow64ConfigRegKey -name $RegValue -Value 1 -PropertyType "DWord" -Force
+
+###########################################################################################################################
+    # Validating the registry changes were successful #
+###########################################################################################################################
+
+    # Redefining the variables so they return the current values, not the values during the initial check #
+
+    $ValidateReg64 = Get-ItemPropertyValue -path $Wow64ConfigRegKey -name $RegValue
+
+    $ValidateReg = Get-ItemPropertyValue -path $ConfigRegKey -name $RegValue
+
+    if (($ValidateReg -eq 1) -and ($ValidateReg64 -eq 1)) {
+        return "Reg changes successful, CertPaddingCheck enabled. Please restart the machine for the changes to take effect."
+    }
+    else {
+        # Giving information to the user on if either reg keys exist, and their values to help troubleshooting #
+
+        $DwordExist = Test-Path -Path "HKLM:\Software\Microsoft\Cryptography\wintrust\config\EnableCertPaddingCheck" -PathType Leaf
+        $Wow64DwordExist = Test-Path -Path "HKLM:\Software\Wow6432Node\Microsoft\Cryptography\Wintrust\Config\EnableCertPaddingCheck" -PathType Leaf
+
+        if ($DwordExist) {
+            $ErrorMsg = "Does exist and its value is $ValidateReg"
+        } else {$ErrorMsg = "Does not exist! Are you administrator?"}
+
+        if ($Wow64DwordExist) {
+            $Wow64ErrorMsg = "Does exist and its value is  $ValidateReg64"
+        } else { $Wow64ErrorMsg = "Does not exist! Are you administrator?" }
+
+        Return "Reg changes failed! HKLM:\Software\Microsoft\Cryptography\wintrust\config\EnableCertPaddingCheck $errormsg `n HKLM:\Software\Wow6432Node\Microsoft\Cryptography\Wintrust\Config\EnableCertPaddingCheck $Wow64ErrorMsg"
+    }
+}
+
+function DisableCertPaddingCheck {
+
+###########################################################################################################################
+    # Making sure it hasn't already been disabled #
+###########################################################################################################################
+
+    $WintrustTest = Test-Path -Path $WintrustRegKey -PathType Container -ErrorAction SilentlyContinue
+    $WintrustTest64 = Test-Path -Path $Wow64WintrustRegKey -PathType Container -ErrorAction SilentlyContinue
+
+    if ((!$WintrustTest) -and (!$WintrustTest64)) {
+        return "CertPaddingCheck is already disabled! Try restarting the machine if the changes have not taken effect."
+    }
+
+###########################################################################################################################
+    # Removing the keys containing the registry values responsible for the changes, reverting them to their default state #
+###########################################################################################################################
+
+    Remove-Item -Path $WintrustRegKey -Force -Recurse
+    Remove-Item  -Path $Wow64WintrustRegKey -Force -Recurse
+
+###########################################################################################################################
+    # Testing to see if the deletion of the keys was successful with the same logic in the initial test #
+###########################################################################################################################
+
+    $WintrustTest = test-path -path $WintrustRegKey -ErrorAction SilentlyContinue 
+    $WintrustTest64 = test-path -path $Wow64WintrustRegKey -ErrorAction SilentlyContinue
+
+    if ((!$WintrustTest) -and (!$WintrustTest64)) {
+        return "Registry changes successful, CertPaddingCheck disabled. Please restart the machine for the changes to take effect"
+    }
+}
+
+#...............................#
+#      END your Functions       #
+#################################
+#################################
+#           Your code           #
+#          Start here           #
+#...............................#
+
+Clear-Host
+
+Write-Host "*******************************"
+Write-Host "***** Commands Avaiable: ******"
+Write-Host "*** EnableCertPaddingCheck ****"
+Write-Host "*** DisableCertPaddingCheck ***"
+Write-Host "*******************************"
+
+#...............................#
+#       END of your code        #
+#################################
+#  ----====== !!!!! ======----  #
