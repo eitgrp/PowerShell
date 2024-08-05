@@ -3,7 +3,7 @@ $AppName = "PDFCreator"
 
 # Search registry for installed apps
 $Apps += Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
-$Apps += Get-ItemProperty "HKLM:\Software\Wow6423Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+$Apps += Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
 
 
 # Look through apps for PDFCreator
