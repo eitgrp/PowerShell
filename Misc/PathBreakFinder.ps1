@@ -1,8 +1,7 @@
-#############################################################################################################################################################################
-# A script that can be used to find where a path breaks, which can be pasted as a function to either output more info on errors or rebuild the path you are trying to reach #
-#                                     ! This script does not support rebuilding of the desired path, however I may add it in the future !                                   #
-#############################################################################################################################################################################
-
+###############################################################################################################################################################################
+# A script that can be used to find where a path breaks, which can be pasted as a function to either output detailed errors, or ran as a user to find where permissions break #
+#                                     ! This script does not support rebuilding of the desired path, however I may add it in the future !                                     #
+###############################################################################################################################################################################
 
 $path = "HKLM:\System\CurrentControlSet\Services\LanManServer\Parameters\asda\wefegfeg\asfsdf"
 
