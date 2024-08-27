@@ -1,6 +1,6 @@
 #############################################################################################################################################################################
 # A script that can be used to find where a path breaks, which can be pasted as a function to either output more info on errors or rebuild the path you are trying to reach #
-#                             ! This script does not work with UNC paths, but I plan to add logic to deal with UNC paths in the future !                                    #
+#                                     ! This script does not support rebuilding of the desired path, however I may add it in the future !                                   #
 #############################################################################################################################################################################
 
 
