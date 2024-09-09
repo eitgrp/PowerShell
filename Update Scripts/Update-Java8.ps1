@@ -90,7 +90,7 @@ function UpdateJava64 {
         # Uninstalling the previous version
         Start-Process $Uninstall64[0].Trim() -args $Uninstall64[1].Trim(), " /quiet /norestart" -Wait
         # Installing the new version
-        Start-Process $Temp\Java8Latest64.exe -args "/s" -Wait
+        Start-Process $Temp\Java8Latest64.exe -args "/s /norestart" -Wait
         # Checking the installed version after the installer has finished running
         $CheckVersion64 = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | where {$_.displayname -like "Java 8*"}).DisplayVersion
 
@@ -113,7 +113,7 @@ function UpdateJava32 {
     # Uninstalling the previous version
     Start-Process $Uninstall32[0].Trim() -args $Uninstall32[1].Trim(), " /quiet /norestart" -Wait
     # Installing the new version
-    Start-Process $Temp\Java8Latest32.exe -args "/s" -Wait
+    Start-Process $Temp\Java8Latest32.exe -args "/s /norestart" -Wait
     # Checking the installed version after the installer has finished running
     $CheckVersion32 = (Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | where {$_.displayname -like "Java 8*"}).DisplayVersion
 
