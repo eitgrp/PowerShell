@@ -88,7 +88,7 @@ function CheckUpdate32 {
 
 function UpdateJava64 {
         # Uninstalling the previous version
-        Start-Process $Uninstall64[0].Trim() -args $Uninstall64[1].Trim(), " /quiet" -Wait
+        Start-Process $Uninstall64[0].Trim() -args $Uninstall64[1].Trim(), " /quiet /norestart" -Wait
         # Installing the new version
         Start-Process $Temp\Java8Latest64.exe -args "/s" -Wait
         # Checking the installed version after the installer has finished running
