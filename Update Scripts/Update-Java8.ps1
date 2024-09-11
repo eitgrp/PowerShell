@@ -1,218 +1,167 @@
-﻿#!ps
-#timeout=600000
-## Install / Update Greenshot
-$Product="Java 8"
-$EvergreenName="OracleJava8"
-$EvergreenType="exe"  # msi or exe
-$EvergreenInstallerType="Default"
-$RestartRequired=$False
-$MinimumSizeMB=1
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-Import-Module Evergreen
+################################
+#           Variables          #
+#          Start here          #
+#..............................#
 
-#PREINSTALL CHECKS
-Write-Host "Checking for existing installation of $Product here..."
+$Apps64 = @()
+$Apps32 = @()
+$AppName = "Java 8"
 
-# Look for installed apps
-$Apps=@()
-$Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" # 32 Bit
-$Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"             # 64 Bit
-$Prod=$Apps | Where-Object { $_.DisplayName -match $Product }
+$latestJava32 = "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=250127_d8aa705069af427f9b83e66b34f5e380"
+$latestJava64 = "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=250129_d8aa705069af427f9b83e66b34f5e380"
+$temp = $env:TEMP
 
-Write-Output "    $($Prod.DisplayName) v$($Prod.DisplayVersion) - Installed: $($Prod.InstallDate)"
 
-# check if this is an RDS server
-If ((Get-WindowsFeature RDS-RD-Server).Installed) {
-    $rds = $true
+#...............................#
+#         END Varibles          # 
+#################################
+#################################
+#         Your functions        #
+#          Start here           #
+#...............................#
+
+
+
+function FindJava64 {
+    # Search registry for installed apps
+    $Apps64 += Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
+    # Look through apps for the specified app
+    foreach ($app in $Apps64) {
+        if ($app.DisplayName -like "$AppName*") {
+            # Grabbing the information we need to check for updates and specifying the scope of these variables
+            $script:Java64Version = [System.Version]::Parse($app.DisplayVersion)
+            $script:Uninstall64 = $App.UninstallString.split(" ")
+            Return $true
+        }
+    }
+    return $null
 }
 
-#Get the current architecture
-If ($Prod) {
-	
-	$Prodx86 = $Prod | where-object { $_.DisplayName -notmatch '64-bit' }
-	$Prodx64 = $Prod | where-object { $_.DisplayName -match '64-bit' }
-	$DoInstall=$false
-	
-    # x86 Installer check/install first
-    If ($Prodx86) {
-        $targetarchitecture = 'x86'
-		# Get the current release for the selected architecture
-		$evergreenapp = get-evergreenapp -Name $EvergreenName | Where-Object { $_.Type -eq $EvergreenType -AND $_.Architecture -eq $targetarchitecture } | Select-Object -First 1
-        # Some manipulation of the JRE installer version from Evergreen to match installed version
-		[version]$alteredVersion = ($evergreenapp.Version.Substring(0,$evergreenapp.Version.IndexOf('-'))).Replace('_', '.')+'0' | Select-object -First 1
-        [version]$ProductVersion = "$($alteredVersion.Minor).$($alteredVersion.Build).$($alteredVersion.Revision).0"
-		[version]$InstalledVersion = [version]$Prodx86.DisplayVersion
-
-		If ([version]$InstalledVersion -ge [version]$ProductVersion) {
-			Write-Host "    PREINSTALL CHECK: $($Prodx86.DisplayName) is already installed and at (or above) the version installed by this script, no action to take."
-		} elseif ([version]$InstalledVersion -lt [version]$ProductVersion) {
-			Write-Host "    PREINSTALL CHECK: $($Prodx86.DisplayName) is already installed here but at a lower release ($InstalledVersion) than the current version ($ProductVersion), installer will execute"
-			$DoInstall=$true
-		}
-	
-		$InstallerPath="C:\Source\Software\$Product"
-		If (!(Test-Path -Path $InstallerPath -PathType Container)) {
-			New-Item -ItemType Directory -Force -Path $InstallerPath
-		}
-
-		If ($DoInstall -eq $True )  { #Download the install package
-		    $DownloadPackage=$evergreenapp.URI
-		    $InstallerPackage="$InstallerPath\$(Split-Path -Path $DownloadPackage -Leaf)"
-		    [int]$Downloads=1
-
-		    $DownloadSuccessful=$false
-		    While ($true -and ($Downloads -lt 10)) {
-			    Write-Host "    Download attempt no. $Downloads - $DownloadPackage"
-			    Invoke-WebRequest -URI $DownloadPackage -OutFile $InstallerPackage
-			    [int]$Downloads = $Downloads+1
-
-			    If (((Get-Item $Installerpackage).Length/1024000) -gt $MinimumSizeMB) { 
-				    $DownloadSuccessful=$true
-				    Write-Host "        SUCCESS"
-				    Break #Succesful, leave loop
-			    } Else {
-				    $evergreenapp = get-evergreenapp -Name $EvergreenName | where-object {$_.Architecture -eq $targetarchitecture -and $_.Type -eq $EvergreenType } | Select-Object -First 1
-				    $DownloadPackage=$evergreenapp.URI
-				    Write-Host "        FAILED"
-			    }
-		    }
-
-		    If ($DownloadSuccessful -eq $false) {
-			    Write-Host "Download from URI has failed after 10 attempts, you may need to try again later"
-			    Throw
-		    }
-
-		    If (Test-Path -Path $InstallerPackage -PathType Leaf) {
-			    Write-Host "    Download completed, unpacking for installation..."
-		    #    Expand-Archive -Path $InstallerPackage -DestinationPath $InstallerPath\$Product-$ProductVersion -Force
-		    } else {
-			    Write-Host "    Download failed"
-			    Throw
-		    }
-
-		    # Test for installer file/executable
-		    $Installer=$InstallerPackage
-		    If (Test-Path $Installer -PathType Leaf) {
-			     If ($rds) {
-				    Start-Process 'change.exe' -ArgumentList "user /install" -NoNewWindow -Wait
-			     }
-			     $logfile = "$InstallerPath\$Product-$($evergreenapp.Architecture).log"
-			     #Start-Process "msiexec.exe" -ArgumentList  "/i $Installer /qn /l*v $logfile"
-			     Start-Process $Installer -ArgumentList "/s REBOOT=Disable EULA=Disable /L $logfile" -NoNewWindow -Wait
-			     If ($rds) {
-				    Start-Process 'change.exe' -ArgumentList "user /execute" -NoNewWindow -Wait
-			     }
-		    } else {
-			    Write-Host "    No installer found in install package - exiting."
-		    }
-
-		    If ($RestartRequired) {
-			    Write-Host "Install of $Product v$ProductVersion has completed, a restart is required to complete installation"
-		    } else {
-			    Write-Host "Install of $Product v$ProductVersion has completed"
-		    }
-
-		    $Apps=@()
-		    $Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" # 32 Bit
-		    $Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"             # 64 Bit
-		    $ProdCheck=$Apps | Where-Object { $_.DisplayName -match $Product }
-
-		    [version]$UpdatedVersion = ($evergreenapp.Version.Substring(0,$evergreenapp.Version.IndexOf('-'))).Replace('_', '.')+'0' | Select-object -First 1
-		    Write-Output "This device now reports that $($ProdCheck.DisplayName) v$($ProdCheck.DisplayVersion) is installed: $($ProdCheck.InstallDate)"
+function FindJava32 {
+    # Search registry for installed apps
+    $Apps32 += Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+    # Look through apps for the specified app
+    foreach ($app in $Apps32) {
+        if ($app.DisplayName -like "$AppName*") {
+            # Grabbing the information we need to check for updates and specifying the scope of these variables
+            $script:Java32Version = [System.Version]::Parse($app.DisplayVersion)
+            $script:Uninstall32 = $App.UninstallString.split(" ")
+            return $True
         }
-		
-	} else {
-		Write-Host "    PREINSTALL CHECK: $Product is not yet installed here, installer will note execute."
-	} 
-
-    # x64 Installer check/install second
-	$DoInstall=$false
-	If ($Prodx64) {
-        $targetarchitecture = 'x64'
-		# Get the current release for the selected architecture
-		$evergreenapp = get-evergreenapp -Name $EvergreenName | Where-Object { $_.Type -eq $EvergreenType -AND $_.Architecture -eq $targetarchitecture } | Select-Object -First 1
-
-        # Some manipulation of the JRE installer version from Evergreen to match installed version
-		[version]$alteredVersion = ($evergreenapp.Version.Substring(0,$evergreenapp.Version.IndexOf('-'))).Replace('_', '.')+'0' | Select-object -First 1
-        [version]$ProductVersion = "$($alteredVersion.Minor).$($alteredVersion.Build).$($alteredVersion.Revision).0"
-        [version]$InstalledVersion = [version]$Prodx64.DisplayVersion
-
-		If ([version]$InstalledVersion -ge [version]$ProductVersion) {
-			Write-Host "    PREINSTALL CHECK: $($Prodx64.DisplayName) is already installed and at (or above) the version installed by this script, no action to take."
-			Throw
-		} elseif ([version]$InstalledVersion -lt [version]$ProductVersion) {
-			Write-Host "    PREINSTALL CHECK: $($Prodx64.DisplayName) is already installed here but at a lower release ($InstalledVersion) than the current version ($ProductVersion), installer will execute"
-			$DoInstall=$true
-		}
-		
-        If ($DoInstall=$True) {
-		    #Download the install package
-		    $DownloadPackage=$evergreenapp.URI
-		    $InstallerPackage="$InstallerPath\$(Split-Path -Path $DownloadPackage -Leaf)"
-		    [int]$Downloads=1
-
-		    $DownloadSuccessful=$false
-		    While ($true -and ($Downloads -lt 10)) {
-			    Write-Host "    Download attempt no. $Downloads - $DownloadPackage"
-			    Invoke-WebRequest -URI $DownloadPackage -OutFile $InstallerPackage
-			    [int]$Downloads = $Downloads+1
-
-			    If (((Get-Item $Installerpackage).Length/1024000) -gt $MinimumSizeMB) { 
-				    $DownloadSuccessful=$true
-				    Write-Host "        SUCCESS"
-				    Break #Succesful, leave loop
-			    } Else {
-				    $evergreenapp = get-evergreenapp -Name $EvergreenName | where-object {$_.Architecture -eq $targetarchitecture -and $_.Type -eq $EvergreenType } | Select-Object -First 1
-				    $DownloadPackage=$evergreenapp.URI
-				    Write-Host "        FAILED"
-			    }
-		    }
-
-		    If ($DownloadSuccessful -eq $false) {
-			    Write-Host "Download from URI has failed after 10 attempts, you may need to try again later"
-			    Throw
-		    }
-
-		    If (Test-Path -Path $InstallerPackage -PathType Leaf) {
-			    Write-Host "    Download completed, unpacking for installation..."
-		    #    Expand-Archive -Path $InstallerPackage -DestinationPath $InstallerPath\$Product-$ProductVersion -Force
-		    } else {
-			    Write-Host "    Download failed"
-			    Throw
-		    }
-
-		    # Test for installer file/executable
-		    $Installer=$InstallerPackage
-		    If (Test-Path $Installer -PathType Leaf) {
-			     If ($rds) {
-				    Start-Process 'change.exe' -ArgumentList "user /install" -NoNewWindow -Wait
-			     }
-			     $logfile = "$InstallerPath\$Product-$($evergreenapp.Architecture).log"
-			     #Start-Process "msiexec.exe" -ArgumentList  "/i $Installer /qn /l*v $logfile"
-			     Start-Process $Installer -ArgumentList "/s REBOOT=Disable EULA=Disable /L $logfile" -NoNewWindow -Wait
-			     If ($rds) {
-				    Start-Process 'change.exe' -ArgumentList "user /execute" -NoNewWindow -Wait
-			     }
-		    } else {
-			    Write-Host "    No installer found in install package - exiting."
-		    }
-
-		    If ($RestartRequired) {
-			    Write-Host "Install of $Product v$ProductVersion has completed, a restart is required to complete installation"
-		    } else {
-			    Write-Host "Install of $Product v$ProductVersion has completed"
-		    }
-
-		    $Apps=@()
-		    $Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" # 32 Bit
-		    $Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"             # 64 Bit
-		    $ProdCheck=$Apps | Where-Object { $_.DisplayName -match $Product }
-
-		    Write-Output "This device now reports that $($ProdCheck.DisplayName) v$($ProdCheck.DisplayVersion) is installed: $($ProdCheck.InstallDate)"
-        }
-
-	} else {
-		Write-Host "    PREINSTALL CHECK: $Product is not yet installed here, installer will note execute."
-		Throw
-	} 
+    }
+    return $null
 }
+
+function CheckUpdate64 {
+    # This bit could be replaced with Evergreen code so downloading the installer isn't needed, however I wanted to avoid it as the version format is not 1:1 like it is in this method
+    Invoke-WebRequest $latestJava64 -OutFile $Temp\Java8Latest64.exe
+    $script:latestVersion64 = [System.Version]::Parse((Get-ItemProperty $Temp\Java8Latest64.exe).VersionInfo.ProductVersion)
+	# Checking the installed version against the latest version
+    if ($latestVersion64 -lt $Java64Version) {
+        Remove-item -Path $Temp\Java8Latest64.exe
+        return $null
+    } elseif ($Java64Version -eq $latestVersion64) {
+        Write-Host "Java 8 64Bit is already up to date."
+        Remove-item -Path $Temp\Java8Latest64.exe
+        return $null
+    } else { return $true }
+
+}
+
+function CheckUpdate32 {
+# This bit could be replaced with Evergreen code so downloading the installer isn't needed, however I wanted to avoid it as the version format is not 1:1 like it is in this method
+    Invoke-WebRequest $latestJava32 -OutFile $Temp\Java8Latest32.exe
+    $script:latestVersion32 = [System.Version]::Parse((Get-ItemProperty $Temp\Java8Latest32.exe).VersionInfo.ProductVersion)
+    # Checking the installed version against the latest version 
+    if ($latestVersion32 -lt $Java32Version ) {
+        Remove-item -Path $Temp\Java8Latest32.exe
+        return $null
+    } elseif ($Java32Version -eq $latestVersion32) {
+        Write-Host "Java 8 32Bit is already up to date."
+        Remove-item -Path $Temp\Java8Latest32.exe
+        return $null
+    } else { return $true }    
+}
+
+
+function UpdateJava64 {
+        # Uninstalling the previous version
+        Start-Process $Uninstall64[0].Trim() -args $Uninstall64[1].Trim(), " /quiet /norestart" -Wait
+        # Installing the new version
+        Start-Process $Temp\Java8Latest64.exe -args "/s" -Wait
+        # Checking the installed version after the installer has finished running
+        $CheckVersion64 = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | where {$_.displayname -like "Java 8*"}).DisplayVersion
+
+        if (!$CheckVersion64) {return "No Java 8 64Bit version found after updating! It's possible the installation did not complete properly."}
+
+        If ($CheckVersion64 -eq $latestVersion64) { 
+            Remove-item -Path $Temp\Java8Latest64.exe
+            Return "Java 8 64Bit successfully updated from $Java64Version to $CheckVersion64"
+        }
+        else { 
+            if ($Checkversion64 -eq $Java64Version) {
+                return "Java 8 64Bit version is the same after updating! It's possible the original installation did not get removed properly. Version found: $CheckVersion64"
+            }
+            else { return "Java 8 64Bit is not at the expected version after updating. The installed version is $CheckVersion64 and the latest version is $latestVersion64" }
+        }
+    }
+
+
+function UpdateJava32 {
+    # Uninstalling the previous version
+    Start-Process $Uninstall32[0].Trim() -args $Uninstall32[1].Trim(), " /quiet /norestart" -Wait
+    # Installing the new version
+    Start-Process $Temp\Java8Latest32.exe -args "/s" -Wait
+    # Checking the installed version after the installer has finished running
+    $CheckVersion32 = (Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | where {$_.displayname -like "Java 8*"}).DisplayVersion
+
+    if (!$CheckVersion32) {return "No Java 8 32Bit version found after updating! It's possible the installation did not complete properly."}
+
+    If ($CheckVersion32 -eq $latestVersion32) { 
+        Remove-item -Path $Temp\Java8Latest32.exe
+        Return "Java 8 32Bit successfully updated from $Java32Version to $CheckVersion32"
+    }
+    else { 
+        if ($Checkversion32 -eq $Java32Version) {
+            return "Java 8 32Bit version is the same after updating! It's possible the original installation did not get removed properly. Version found: $CheckVersion32"
+        }
+        else { return "Java 8 32Bit is not at the expected version after updating. The installed version is $CheckVersion32 and the latest version is $latestVersion32" }
+    }
+}
+
+#...............................#
+#      END your Functions       #
+#################################
+#################################
+#           Your code           #
+#          Start here           #
+#...............................#
+
+$FindJava32 = FindJava32
+$FindJava64 = FindJava64
+
+
+if ((!$FindJava32) -and (!$FindJava64)) {
+    return "No Java 8 installation found in 32 bit or 64 bit registry. Please double check Java is present on the machine"
+}
+
+if ($FindJava32) {
+    $CheckUpdates32 = CheckUpdate32
+    if ($CheckUpdates32) {
+        UpdateJava32
+    }
+} else { Write-Host "Java 8 32Bit not found, moving on to 64Bit..." }
+
+if ($FindJava64) {
+    $CheckUpdates64 = CheckUpdate64
+    if ($CheckUpdates64) {
+        UpdateJava64
+    }
+}  else { Write-Host "Java 8 64Bit not found..."}
+
+#...............................#
+#       END of your code        #
+#################################
+#  ----====== !!!!! ======----  #
