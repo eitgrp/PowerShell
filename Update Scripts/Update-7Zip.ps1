@@ -1,4 +1,5 @@
-﻿#!ps
+﻿#test
+#!ps
 #timeout=600000
 ## Install / Update 7-Zip
 $Product="7-Zip"
