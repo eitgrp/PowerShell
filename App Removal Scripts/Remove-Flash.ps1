@@ -13,7 +13,7 @@ foreach ($app in $apps) {
         $AppFound = 1
         # Splitting the string to seperate the argument
         $Uninstall = $App.UninstallString.split(" ")
-        Start-Process $Uninstall[0].Trim() -args $Uninstall[1].Trim(), " /quiet"
+        Start-Process $Uninstall[0].Trim() -args $Uninstall[1].Trim(), " /quiet /norestart"
     }
 }
 
