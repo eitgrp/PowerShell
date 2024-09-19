@@ -11,7 +11,7 @@ foreach ($app in $apps) {
     if ($app.DisplayName -like "*$AppName*") {
         $AppFound = 1
         # The uninstall exe is uninst000.exe, so "/VERYSILENT" has to be specified for silent removal
-        Start-Process $app.UninstallString -args "/VERYSILENT"
+        Start-Process $app.UninstallString -args "/VERYSILENT /NORESTART"
     }
 }
 
