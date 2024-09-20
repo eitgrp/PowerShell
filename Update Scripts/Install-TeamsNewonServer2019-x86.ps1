@@ -420,7 +420,7 @@ if ($PendReboot -eq "true") {
 	Start-Process "msiexec" -ArgumentList @("/i ""$MSTAddinMSI""","/qn","/norestart ALLUSERS=1 TARGETDIR=""$targetDir"" /L*V ""C:\Program Files (x86)\Microsoft\TeamsMeetingAddin\MSTMeetingAddin.log""") -Wait
 	Start-Process "c:\windows\System32\regsvr32.exe" -ArgumentList @("/s","/n","/i:user ""$targetDir\x64\Microsoft.Teams.AddinLoader.dll""")  -wait
 
-	Write-Host "`n Finished! Reboot, if required by the Windows Udpate!`n"
+	Write-Host "`n Finished! Reboot, if required by the Windows Update!`n"
 
 }
 
