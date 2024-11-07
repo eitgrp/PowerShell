@@ -1,5 +1,7 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+import-module evergreen
+
 ################################
 #           Variables          #
 #          Start here          #
@@ -9,8 +11,8 @@ $Apps64 = @()
 $Apps32 = @()
 $AppName = "Java 8"
 
-$latestJava32 = "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=250127_d8aa705069af427f9b83e66b34f5e380"
-$latestJava64 = "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=250129_d8aa705069af427f9b83e66b34f5e380"
+$latestJava32 = (get-evergreenapp OracleJava8 | where {$_.architecture -eq "x86"}).URI
+$latestJava64 = (get-evergreenapp OracleJava8 | where {$_.architecture -eq "x64"}).URI 
 $temp = $env:TEMP
 
 
