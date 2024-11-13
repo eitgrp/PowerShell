@@ -46,7 +46,10 @@ if ($InstalledVersion -lt $NewVersion) {
 }
 
 # Reusing this to check the version after the change
-$InstalledVersion = [System.Version]::Parse((Get-WmiObject -Class Win32_Product | where {$_.name -eq "micollab"}).Version)
+
+$InstalledApp = Get-WmiObject -Class Win32_Product | where {$_.name -eq "micollab"}
+
+$InstalledVersion = [System.Version]::Parse(($InstalledApp).Version)
 
 # Now it's been updated, the installed version should equal the new version defined earlier. -ne means not equal, so if the version numbers don't match, do this
 if ($InstalledVersion -ne $NewVersion) {
