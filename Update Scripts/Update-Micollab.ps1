@@ -28,6 +28,9 @@ $InstalledVersion = [System.Version]::Parse($InstalledApp.Version)
 # If the version number installed is less than (-lt) the new version, then do {whatever is in these curly brackets}
 if ($InstalledVersion -lt $NewVersion) {
 
+    # Createing a new folder in Source\Software called "Micollab" (And specifying its a folder with ItemType Directory)
+    New-Item -Path "C:\Source\Software\" -Name "Micollab" -ItemType Directory
+
     # Making a HTTP(s) request to that URL, which leads to the file. Telling it to save the output as this file/location
     Invoke-WebRequest -uri $Url -OutFile "C:\Source\Software\MiCollab\MiCollab-9.8.204.msi"
 
