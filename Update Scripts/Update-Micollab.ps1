@@ -32,7 +32,7 @@ if ($InstalledVersion -lt $NewVersion) {
     Invoke-WebRequest -uri $Url -OutFile "C:\Source\Software\MiCollab\MiCollab-9.8.204.msi"
 
     # Start a new process (msiexec) -args specifies the arguments, equivilent to putting "msiexec /i C:\source\micollab.msi /qn /norestart" in CMD/Powershell
-    Start-Process msiexec -args "/i C:\source\micollab.msi /qn /norestart"
+    Start-Process msiexec -args "/i C:\Source\Software\MiCollab\MiCollab-9.8.204.msi /qn /norestart"
 
     # ELSE means, if the original if statement isn't true, do { this } in all other scenarios
 } ELSE {
