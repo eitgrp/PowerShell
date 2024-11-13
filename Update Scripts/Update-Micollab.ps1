@@ -37,7 +37,7 @@ if ($InstalledVersion -lt $NewVersion) {
     # ELSE means, if the original if statement isn't true, do { this } in all other scenarios
 } ELSE {
 
-    # Return means "stop running here and output this message", no code will run beyond here (Except if it's a function or loop, but that's not covered in this script)
+    # Return means "stop running here and output this message", no code will run beyond here (Except if it's in a function or loop, but that's not covered in this script)
     Return "No update required."
 
 }
