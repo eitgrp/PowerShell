@@ -7,7 +7,7 @@ $Url = "https://fileshare.bistech.co.uk/fileshare/mitel/micollab/micollab_pc_9.8
 
 # The version thats in the URL (micollab_pc_9.8.204.msi)
 # The System.Version is basically saying "This number is a product version", so Powershell compares it properly
-$NewVersion = [System.Version]::Parse(9.8.204)
+$NewVersion = [System.Version]::Parse('9.8.204')
 
 # "Get-WmiObject -Class Win32_Product" will return all apps installed
 # I'm using a "where" statement to say "I only want apps where the apps ($_) name property (.name) equals (-eq) "Micollab""
