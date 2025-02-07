@@ -4,8 +4,6 @@
 #          Start here          #
 #..............................#
 
-
-### ONLY UPDATES IRFAN VIEW TO 4.70 ###
 $AppName = "IrfanView"
 
 $latestApp32 = "http://static.desktopservice.eu/downloads/IrfanView/iview470_setup.exe"
