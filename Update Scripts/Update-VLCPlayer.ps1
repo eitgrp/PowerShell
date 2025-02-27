@@ -11,16 +11,22 @@ $InstallerPath = "C:\Source\Software\VLC-Installer.exe"
 
 # What to do if -Install is specified
 if ($Install) {
+        # This try/catch is to ensure compatibility with both PWSH 5.1 and PWSH 7, as 7 needs -AllowInsecureRedirect which does not exist in 5.1.
+    try {
         iwr ($WebUrl + $FileName) -OutFile $InstallerPath
+    } catch {
+        iwr ($WebUrl + $FileName) -OutFile $InstallerPath -AllowInsecureRedirect
+    }
         Start-Process $InstallerPath -args "/L=1033 /S" -Wait
         Return "Successfully installed VLC $LatestVLCVersion"
     }
 # Grabbing the currently installed version
-$CurrentVLCVersion = [System.Version]::Parse((get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | where DisplayIcon -like "*vlc*").DisplayVersion)
-
-if (!$CurrentVLCVersion) {
-    return "VLC does not seem to be installed. Please use the -Install switch to run a fresh install using this script"
+try { 
+    $CurrentVLCVersion = [System.Version]::Parse((get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | where DisplayIcon -like "*vlc*").DisplayVersion)
+} Catch {
+    throw "VLC does not seem to be installed. Please use the -Install switch to run a fresh install using this script"
 }
+
 
 # What to do if VLC is installed but out of date
 if ($CurrentVLCVersion -lt $LatestVLCVersion) {
@@ -32,7 +38,7 @@ if ($CurrentVLCVersion -lt $LatestVLCVersion) {
     }
 
     Start-Process $InstallerPath -args "/L=1033 /S" -Wait
-    
+
     $CurrentVLCVersion = [System.Version]::Parse((get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | where DisplayIcon -like "*vlc*").DisplayVersion)
     if ($CurrentVLCVersion -eq $LatestVLCVersion) {
         Return "Successfully updated VLC to version $CurrentVLCVersion."
