@@ -24,10 +24,7 @@ if ($Install) {
 try { 
     $CurrentVLCVersion = [System.Version]::Parse((get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | where DisplayIcon -like "*vlc*").DisplayVersion)
 } Catch {
-        $CurrentVLCVersion = [System.Version]::Parse((get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | where DisplayName -like "*vlc*").DisplayVersion)
-        if (!$CurrentVLCVersion) {
-                throw "VLC does not seem to be installed. Please use the -Install switch to run a fresh install using this script"
-        }
+        throw "VLC does not seem to be installed. Please use the -Install switch to run a fresh install using this script"
 }
 
 
