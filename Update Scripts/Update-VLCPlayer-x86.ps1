@@ -17,7 +17,7 @@ if ($Install) {
     } catch {
         iwr ($WebUrl + $FileName) -OutFile $InstallerPath -AllowInsecureRedirect
     }
-        Start-Process $InstallerPath -args "/L=1033 /S" -Wait
+        Start-Process $InstallerPath -args '/L="1033" /S' -Wait
         Return "Successfully installed VLC $LatestVLCVersion"
     }
 # Grabbing the currently installed version
