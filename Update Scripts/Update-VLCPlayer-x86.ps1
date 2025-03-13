@@ -24,7 +24,7 @@ if ($Install) {
 try { 
     $CurrentVLCVersion = [System.Version]::Parse((get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | where DisplayName -like "*vlc*").DisplayVersion)
 } Catch {
-    throw "VLC does not seem to be installed. Please use the -Install switch to run a fresh install using this script
+    throw "VLC does not seem to be installed. Please use the -Install switch to run a fresh install using this script"
 }
 
 
@@ -37,7 +37,7 @@ if ($CurrentVLCVersion -lt $LatestVLCVersion) {
         iwr ($WebUrl + $FileName) -OutFile $InstallerPath -AllowInsecureRedirect
     }
 
-    Start-Process $InstallerPath -args "/L=1033 /S" -Wait
+    Start-Process $InstallerPath -args '/L="1033" /S' -Wait
 
     $CurrentVLCVersion = [System.Version]::Parse((get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | where DisplayName -like "*vlc*").DisplayVersion)
     if ($CurrentVLCVersion -eq $LatestVLCVersion) {
