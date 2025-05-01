@@ -3,7 +3,7 @@ $DownloadURL = (Get-EvergreenApp SoberLemurPDFSamBasic | where {($_.Architecture
 try {
     $InstalledVersion = [system.version]::Parse((Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | where {$_.DisplayName -like "PDFSam*"}).DisplayVersion)
 } Catch {
-    $InstalledVersion = [system.version]::Parse((Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\" | where {$_.DisplayName -like "PDFSam*"}).DisplayVersion)
+    $InstalledVersion = [system.version]::Parse((Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | where {$_.DisplayName -like "PDFSam*"}).DisplayVersion)
 }
 if ($InstalledVersion -lt $LatestVersion) {
     $Test = Test-Path -path "C:\source\Software\PDFSam\"
