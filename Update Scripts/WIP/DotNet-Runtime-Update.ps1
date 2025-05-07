@@ -56,7 +56,7 @@ foreach ($Package in $PackagesToCheck) {
     Switch ($Package) {
         ("MicrosoftWindowsDesktop.App") {
             
-            $dotnetVersionWebAddress = (((Invoke-WebRequest $url -usebasicparsing).links).href )
+            $dotnetVersionWebAddress = (Invoke-WebRequest $url -usebasicparsing).links.href
             $runtimeDesktop8 = ($dotnetVersionWebAddress | Select-String -Pattern 'runtime-Desktop-\d.\d.\d+-windows-x64-installer').Matches.Value[0]
             $VerString = ($runtimeDesktop8 | select-string -pattern '\d.\d.\d+').matches.value
             $LatestVer = [system.version]::Parse($VerString)
