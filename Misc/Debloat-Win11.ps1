@@ -12,7 +12,8 @@ $ProvisonedPackages = @(
     'Microsoft.MicrosoftOfficeHub',
     'Microsoft.Getstarted',
     'Clipchamp.Clipchamp',
-    'Microsoft.Windows.DevHome'
+    'Microsoft.Windows.DevHome',
+    'MicrosoftTeams' # This is Teams (Personal)
 )
 
 $AppxPackages = @(
@@ -27,7 +28,8 @@ $AppxPackages = @(
     'Microsoft.MicrosoftOfficeHub',
     'Microsoft.Getstarted',
     'Clipchamp.Clipchamp',
-    'Microsoft.Windows.DevHome'
+    'Microsoft.Windows.DevHome',
+    'MicrosoftTeams' # This is Teams (Personal)
 )
 
 FOREACH ($app in $ProvisionedPackages) {
