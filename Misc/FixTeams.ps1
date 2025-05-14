@@ -18,4 +18,4 @@ Remove-Item "C:\Program Files (x86)\Microsoft\Teams" -Recurse -Force
 
 Remove-Item "HKLM:\SOFTWARE\Microsoft\Teams" -Recurse -Force
 
-Start-Process Powershell -args "C:\source\software\Install-TeamsNewonServer2019-x86.ps1"
+Start-Process Powershell -args "C:\source\software\Install-TeamsNewonServer2019-x86.ps1" -wait
