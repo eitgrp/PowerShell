@@ -36,7 +36,14 @@ $AppxPackages = @(
     'Microsoft.Getstarted',
     'Clipchamp.Clipchamp',
     'Microsoft.Windows.DevHome',
-    'MicrosoftTeams' # This is Teams (Personal)
+    'MicrosoftTeams', # This is Teams (Personal)
+    'Microsoft.Xbox.TCUI',
+    'Microsoft.XboxGameOverlay',
+    'Microsoft.XboxIdentityProvider',
+    'Microsoft.XboxSpeechToTextOverlay',
+    'Microsoft.XboxGamingOverlay',
+    'MicrosoftCorporationII.QuickAssist',
+    'Microsoft.BingSearch'
 )
 
 FOREACH ($app in $ProvisionedPackages) {
