@@ -49,7 +49,7 @@ foreach ($Package in $PackagesToCheck | where Version -like "*.*") {
     $LatestVer = [system.version]::Parse($VerString)
     $installedVer = [system.version]::Parse($Package.Version)
     if ($installedVer -lt $latestVer) {
-        New-Item "C:\source\Software" -ItemType Directory -ErrorAction SilentlyContinue
+        New-Item "C:\source\Software\DotNet" -ItemType Directory -ErrorAction SilentlyContinue
         Switch ($Package.PackageName) {
             ("Microsoft.WindowsDesktop.App") {
                 $urls = @(
@@ -72,7 +72,7 @@ foreach ($Package in $PackagesToCheck | where Version -like "*.*") {
         }
         foreach ($DLUrl in $urls) {
             $Split = $DLUrl.Split("/").count
-            $filepath = "C:\source\Software\" + ($DLUrl.Split("/")[$split - 1])
+            $filepath = "C:\source\Software\DotNet\" + ($DLUrl.Split("/")[$split - 1])
             Invoke-WebRequest $DLUrl -OutFile $filepath
             Start-Process $filepath -args "/install /quiet" -Wait
         }
