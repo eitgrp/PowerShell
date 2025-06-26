@@ -1,4 +1,4 @@
-$installed = (Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\*") + (Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sharedfx\*").Property 
+$installed = (Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\*" -ErrorAction SilentlyContinue) + (Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sharedfx\*" -ErrorAction SilentlyContinue).Property 
 $PackagesToCheck = @()
 
  if ($installed.PSChildName -Contains "Microsoft.WindowsDesktop.App") {
@@ -10,7 +10,7 @@ $PackagesToCheck = @()
         $Package | Add-Member -MemberType NoteProperty -Name "Version" -value $Version
         $PackagesToCheck += $Package
     }
-} ELSEif ($installed.PSChildName -contains "Microsoft.NETCore.App") {
+} if ($installed.PSChildName -contains "Microsoft.NETCore.App") {
     $PackageName = "Microsoft.NETCore.App"
     $Versions = (get-item "HKLM:\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\$PackageName" -erroraction silentlycontinue).Property + (get-item "HKLM:\SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x86\sharedfx\$PackageName" -erroraction silentlycontinue).Property
     foreach ($Version in $Versions) {
