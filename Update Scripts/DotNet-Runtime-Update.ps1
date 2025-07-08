@@ -43,6 +43,7 @@ foreach ($Package in $PackagesToCheck | where Version -like "*.*") {
             $url = "https://dotnet.microsoft.com/en-us/download/dotnet/10.0"
             $Pattern = 'runtime-Desktop-\d\d.\d.\d+'
         }
+        Default {Throw "Unrecognized Version of DotNet ($($Package.Version.Split(".")[0])). This most likely is an EOL Version, and will skipped by this script."}
     }
     $dotnetVersionWebAddress = (Invoke-WebRequest $url -usebasicparsing).links.href
     $VerString = ($dotnetVersionWebAddress | Select-String -Pattern $Pattern).Matches.Value[0].Trim("runtime-desktop-")
