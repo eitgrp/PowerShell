@@ -100,7 +100,7 @@ If (Test-Path $Installer -PathType Leaf) {
      }
      #$logfile = "$InstallerPath\$Product-$($evergreenapp.Architecture).log"
      #Start-Process "msiexec.exe" -ArgumentList  "/i $Installer /qn /l*v $logfile" -NoNewWindow -Wait
-     Start-Process $Installer -ArgumentList "/VERYSILENT /LOG=$logfile" -NoNewWindow -Wait
+     Start-Process $Installer -ArgumentList "/VERYSILENT  /SUPPRESSMSGBOXES /NORESTART /SP- /LOG=$logfile" -NoNewWindow -Wait
      If ($rds) {
         Start-Process 'change.exe' -ArgumentList "user /execute" -NoNewWindow -Wait
      }
