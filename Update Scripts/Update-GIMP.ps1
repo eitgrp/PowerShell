@@ -1,6 +1,8 @@
-﻿#!ps
+<#
+ #!ps
 #timeout=600000
 ## Install / Update 7-Zip
+#>
 $Product="GIMP"
 $EvergreenName="GIMP"
 $EvergreenType="exe"  # msi or exe
