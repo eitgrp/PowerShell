@@ -18,7 +18,7 @@ $Apps=@()
 $Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" # 32 Bit
 $Apps+=Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"             # 64 Bit
 $Prod=$Apps | Where-Object { $_.DisplayName -match $Product }
-
+$UninstallString = ($Prod.QuietUninstallString).Split(" ")
 Write-Output "    $($Prod.DisplayName) v$($Prod.DisplayVersion) - Installed: $($Prod.InstallDate)"
 
 #Get the current architecture
@@ -100,6 +100,7 @@ If (Test-Path $Installer -PathType Leaf) {
      }
      #$logfile = "$InstallerPath\$Product-$($evergreenapp.Architecture).log"
      #Start-Process "msiexec.exe" -ArgumentList  "/i $Installer /qn /l*v $logfile" -NoNewWindow -Wait
+     Start-Process $UninstallString[0] -args "$UninstallString[1]"
      Start-Process $Installer -ArgumentList "/VERYSILENT  /SUPPRESSMSGBOXES /NORESTART /SP- /LOG=$logfile" -NoNewWindow -Wait
      If ($rds) {
         Start-Process 'change.exe' -ArgumentList "user /execute" -NoNewWindow -Wait
