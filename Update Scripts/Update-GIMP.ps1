@@ -62,13 +62,13 @@ If (!(Test-Path -Path $InstallerPath -PathType Container)) {
 #Download the install package
 $DownloadPackage=$evergreenapp.URI
 $InstallerPackage="$InstallerPath\$(Split-Path -Path $DownloadPackage -Leaf)"
-[int]$Downloads=1
+$Downloads=1
 
 $DownloadSuccessful=$false
 While ($true -and ($Downloads -lt 10)) {
     Write-Host "    Download attempt no. $Downloads - $DownloadPackage"
     $null = Invoke-WebRequest -URI $DownloadPackage -OutFile $InstallerPackage
-    [int]$Downloads = $Downloads+1
+    $Downloads++
 
     If (((Get-Item $Installerpackage).Length/1024000) -gt $MinimumSizeMB) { 
         $DownloadSuccessful=$true
@@ -103,7 +103,7 @@ If (Test-Path $Installer -PathType Leaf) {
      #$logfile = "$InstallerPath\$Product-$($evergreenapp.Architecture).log"
      #Start-Process "msiexec.exe" -ArgumentList  "/i $Installer /qn /l*v $logfile" -NoNewWindow -Wait
      Start-Process "$($UninstallString[0].Replace('"',''))" -args "/$($UninstallString[1])"
-     Start-Process $Installer -ArgumentList "/VERYSILENT  /SUPPRESSMSGBOXES /NORESTART /SP- /LOG=$logfile" -NoNewWindow -Wait
+     Start-Process $Installer -ArgumentList "/VERYSILENT  /SUPPRESSMSGBOXES /NORESTART /SP-" -NoNewWindow -Wait
      If ($rds) {
         Start-Process 'change.exe' -ArgumentList "user /execute" -NoNewWindow -Wait
      }
