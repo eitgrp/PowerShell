@@ -162,34 +162,34 @@ Start-Process "msiexec" -ArgumentList @("/i ""$InstallPath\MSTeamsNativeUtility.
 # Install EdgeWebView Runtime (x64)
 #
 # Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2124701' -Destination "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Description "Download latest EdgeWebView Runtime"
-#(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2124701", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe")
-#Write-Host "...Install EdgeWebView Runtime. Please wait."
-#Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Args "/silent /install"
+(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2124701", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe")
+Write-Host "...Install EdgeWebView Runtime. Please wait."
+Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Args "/silent /install"
 
 #
 # Install EdgeWebView Runtime (x86)
 #
 # Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2124701' -Destination "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Description "Download latest EdgeWebView Runtime"
-(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2099617", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe")
-Write-Host "...Install EdgeWebView Runtime. Please wait."
-Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe" -Args "/silent /install"
+# (New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2099617", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe")
+# Write-Host "...Install EdgeWebView Runtime. Please wait."
+# Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe" -Args "/silent /install"
 
 
 #
 # Install new Teams (x64)
 #
 #Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2196106' -Destination "$InstallPath\MSTeams-x64.msix" -Description "Download latest Microsoft teams version"
-#(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196106", "$InstallPath\MSTeams-x64.msix")
-#Write-Host "...Install Teams (New)"
-#Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x64.msix /SkipLicense"
+(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196106", "$InstallPath\MSTeams-x64.msix")
+Write-Host "...Install Teams (New)"
+Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x64.msix /SkipLicense"
 
 
 #
 # Install new Teams (x86)
 #
-(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196060", "$InstallPath\MSTeams-x86.msix")
-Write-Host "...Install Teams (New)"
-Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x86.msix /SkipLicense"
+# (New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196060", "$InstallPath\MSTeams-x86.msix")
+# Write-Host "...Install Teams (New)"
+# Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x86.msix /SkipLicense"
 
 
 #
@@ -325,34 +325,34 @@ if ($PendReboot -eq "true") {
 	# Install EdgeWebView Runtime (x64)
 	#
 	# Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2124701' -Destination "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Description "Download latest EdgeWebView Runtime"
-	#(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2124701", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe")
-	#Write-Host "...Install EdgeWebView Runtime. Please wait."
-	#Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Args "/silent /install"
+	(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2124701", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe")
+	Write-Host "...Install EdgeWebView Runtime. Please wait."
+	Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Args "/silent /install"
 
 	#
 	# Install EdgeWebView Runtime (x86)
 	#
 	# Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2124701' -Destination "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX64.exe" -Description "Download latest EdgeWebView Runtime"
-	(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2099617", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe")
-	Write-Host "...Install EdgeWebView Runtime. Please wait."
-	Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe" -Args "/silent /install"
+	# (New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2099617", "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe")
+	# Write-Host "...Install EdgeWebView Runtime. Please wait."
+	# Start-Process -wait -FilePath "$InstallPath\MicrosoftEdgeWebView2RuntimeInstallerX86.exe" -Args "/silent /install"
 
 
 	#
 	# Install new Teams (x64)
 	#
 	#Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/?linkid=2196106' -Destination "$InstallPath\MSTeams-x64.msix" -Description "Download latest Microsoft teams version"
-	#(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196106", "$InstallPath\MSTeams-x64.msix")
-	#Write-Host "...Install Teams (New)"
-	#Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x64.msix /SkipLicense"
+	(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196106", "$InstallPath\MSTeams-x64.msix")
+	Write-Host "...Install Teams (New)"
+	Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x64.msix /SkipLicense"
 
 
 	#
 	# Install new Teams (x86)
 	#
-	(New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196060", "$InstallPath\MSTeams-x86.msix")
-	Write-Host "...Install Teams (New)"
-	Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x86.msix /SkipLicense"
+	# (New-Object Net.WebClient).DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196060", "$InstallPath\MSTeams-x86.msix")
+	# Write-Host "...Install Teams (New)"
+	# Start-Process -wait -NoNewWindow -FilePath DISM.exe -Args "/Online /Add-ProvisionedAppxPackage /PackagePath:$InstallPath\MSTeams-x86.msix /SkipLicense"
 
 	# Create shortcut (All Users Desktop
 	$TargetFile = "shell:appsFolder\MSTeams_8wekyb3d8bbwe!MSTeams"
@@ -399,10 +399,10 @@ if ($PendReboot -eq "true") {
 	$MSTappxPath = $MSTappx.InstallLocation
 	 
 	# x64
-	# $MSIname = "MicrosoftTeamsMeetingAddinInstaller.msi"
+	$MSIname = "MicrosoftTeamsMeetingAddinInstaller.msi"
 
 	# x86
-	$MSIname = "MicrosoftTeamsMeetingAddinInstallerx86.msi"
+	# $MSIname = "MicrosoftTeamsMeetingAddinInstallerx86.msi"
 
 	$MSTAddinMSI = "$MSTappxPath\$MSIName"
 	$applockerinfo = (Get-AppLockerFileInformation -Path $MSTAddinMSI | Select -ExpandProperty Publisher)
