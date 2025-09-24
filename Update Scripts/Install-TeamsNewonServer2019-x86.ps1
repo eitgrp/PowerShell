@@ -1,6 +1,3 @@
-#!ps - THIS SCRIPT DOES NOT WORK IN SCREENCONNECT - NEEDS A LOGGED IN ADMIN USER
-#timeout=1000000
-
 <#
         .SYNOPSIS
             Installs the new Microsoft Teams x86 on Windows Server 2019, including the Outlook Add-in

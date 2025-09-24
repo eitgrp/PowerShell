@@ -1,6 +1,4 @@
-﻿#!ps
-#timeout=1000000
-<#
+﻿<#
         .SYNOPSIS
             Installs the new Microsoft Teams x64 on Windows Server 2019, including the Outlook Add-in
             and sets required registry keys. The new Teams is based on EdgeWebView Runtime and will
