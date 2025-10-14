@@ -1,18 +1,17 @@
-Get-AppxProvisionedPackage -Online `
-	| where {$_.Displayname -like "*teams*"} `
-		| Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | where {$_.Displayname -like "*teams*"} | Remove-AppxProvisionedPackage -Online
 
-Get-AppxPackage *teams* -AllUsers `
-	| Remove-AppxPackage -AllUsers
+Get-AppxPackage *teams* -AllUsers | Remove-AppxPackage -AllUsers
 
-Get-ChildItem "C:\Windows\Temp\" -Recurse `
-    | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+try {
+    Get-ChildItem "C:\Windows\Temp\" -Recurse -ErrorAction Continue | Remove-Item -Recurse -Force -ErrorAction Continue
+    Get-ChildItem "C:\ProgramData\Temp\" -Recurse -ErrorAction Continue | Remove-Item -Recurse -Force -ErrorAction Continue
+}
+catch {
+    Write-Host "Removing items failed."
+    exit
+}
 
-Get-ChildItem "C:\ProgramData\Temp\" -Recurse `
-    | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-
-(gwmi win32_product `
-    | where {$_.name -match "Teams"}).Uninstall
+(gwmi win32_product | where {$_.name -match "Teams"}).Uninstall
 
 Remove-Item "C:\Program Files\Microsoft\Teams" -Recurse -Force -ErrorAction SilentlyContinue
 
