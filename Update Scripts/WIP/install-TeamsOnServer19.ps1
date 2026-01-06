@@ -52,14 +52,39 @@ function Install-TeamsOn2019_32Bit {
 }
 
 function Install-TeamsOn2019_64Bit {
+
+    #TODO: need to create the logic for the below - this needs to be added in before the Teams bootstrapper/msix installation stuff.
+<#
+Install machine-wide (ALLUSERS=1) the 'Windows 10 1809 and Windows Server 2019 KB5035849 240209_02051 Feature Preview.msi'.
+
+Open your Group Policy Editor. Navigate to Computer Configuration\Administrative Templates\KB5035849 240209_02051 Feature Preview\Windows 10, version 1809 and Windows Server 2019. Change the value of that Setting to Enabled.
+
+Install KB5035849 March 2024 cumulative update from the Microsoft Update Catalog or WSUS for Enterprises.
+
+Install machine-wide (ALLUSERS=1) the 'MSTeamsNativeUtility.msi'.
+
+Reboot the virtual machine.
+#>
+
+
     "$(get-date) - Downloading the Teams bootstrapper and the MSIX..." | Add-Content $log
 
-    $downloader.DownloadFile("https://go.microsoft.com/fwlink/?linkid=2243204&clcid=0x409","$InstallPath\teamsbootstrapper.exe") # downloads the bootstrapper exe
+    #? bootstrapper removed due to information about teams on WinSer2019 here https://learn.microsoft.com/en-us/microsoftteams/teams-client-vdi-requirements-deploy#deploy-the-microsoft-teams-client
+    #  $downloader.DownloadFile("https://go.microsoft.com/fwlink/?linkid=2243204&clcid=0x409","$InstallPath\teamsbootstrapper.exe") # downloads the bootstrapper exe
     $downloader.DownloadFile("https://go.microsoft.com/fwlink/?linkid=2196106","$InstallPath\MSTeams-x64.msix") # downloads the msix for the bootstrapper to deploy.
 
     "$(get-date) - Start the bootstrapper" | Add-Content $log
 
-    Start-Process "$InstallPath\teamsbootstrapper.exe" -ArgumentList "-p -o `"$InstallPath\MSTeams-x64.msix`""
+    #? removed - see above
+    # Start-Process "$InstallPath\teamsbootstrapper.exe" -ArgumentList "-p -o `"$InstallPath\MSTeams-x64.msix`""
+
+    #start dism and install via the msix.  this is required as the bootstrapper is not supported on WinSer2019 as stated above.
+    try {
+    start-process "Dism.exe" -ArgumentList "/Online /add-provisionedappxpackage /packagepath:$InstallPath\MSTeams-x64.msix /skiplicense" -Wait -ErrorAction Stop
+    }
+    catch {
+        "$(get-date) - Dism failed to install msix" | Add-Content $log
+    }
 
 }
 
