@@ -66,7 +66,12 @@ Install machine-wide (ALLUSERS=1) the 'MSTeamsNativeUtility.msi'.
 Reboot the virtual machine.
 #>
 
-
+    $downloader.DownloadFile("https://statics.teams.cdn.office.net/evergreen-assets/DesktopClient/Windows%2010%201809%20and%20Windows%20Server%202019%20KB5035849%20240209_02051%20Feature%20Preview.msi","$InstallPath\WinSer2019FeaturePreview.msi")
+    try{
+        Start-Process "msiexec.exe" -ArgumentList @("/i `"$InstallPath\WinSer2019FeaturePreview.msi`"","/qn","/norestart","ALLUSERS=1") -Wait
+    }catch{
+        "$(get-date) - FeaturePreview.msi didn't install correctly" | add-content $log
+    }
     "$(get-date) - Downloading the Teams bootstrapper and the MSIX..." | Add-Content $log
 
     #? bootstrapper removed due to information about teams on WinSer2019 here https://learn.microsoft.com/en-us/microsoftteams/teams-client-vdi-requirements-deploy#deploy-the-microsoft-teams-client
@@ -80,7 +85,7 @@ Reboot the virtual machine.
 
     #start dism and install via the msix.  this is required as the bootstrapper is not supported on WinSer2019 as stated above.
     try {
-    start-process "Dism.exe" -ArgumentList "/Online /add-provisionedappxpackage /packagepath:$InstallPath\MSTeams-x64.msix /skiplicense" -Wait -ErrorAction Stop
+    start-process "Dism.exe" -ArgumentList @("/Online","/add-provisionedappxpackage","/packagepath:$InstallPath\MSTeams-x64.msix","/skiplicense") -Wait -ErrorAction Stop
     }
     catch {
         "$(get-date) - Dism failed to install msix" | Add-Content $log
